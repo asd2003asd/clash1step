@@ -54,12 +54,16 @@ while [[ -z ${gate_ip} ]]; do
     gate_ip=$(whiptail --inputbox --nocancel "输入网关IP（输入网关IP（ros的ip或者爱快ip）" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
 done
 
-while [[ -z ${svr_domain} ]]; do
-    svr_domain=$(whiptail --inputbox --nocancel "灯塔服务端域名" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
+while [[ -z ${dns} ]]; do
+    dns=$(whiptail --inputbox --nocancel "输入dns（随你喜欢）" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
 done
 
-while [[ -z ${svr_pwd} ]]; do
-    svr_pwd=$(whiptail --inputbox --nocancel "灯塔服务端密码" 8 78 --title "输入密码" 3>&1 1>&2 2>&3)
+while [[ -z ${mtu} ]]; do
+    mtu=$(whiptail --inputbox --nocancel "输入MTU" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${mss} ]]; do
+    mss=$(whiptail --inputbox --nocancel "输入MSS" 8 78 --title "输入密码" 3>&1 1>&2 2>&3)
 done
 }
 
@@ -1541,6 +1545,9 @@ iface $eth_n inet static
   address $loc_ip
   netmask 255.255.255.0
   gateway $gate_ip
+  dns-nameservers $dns
+  mtu $mtu
+  mss $mss
 EOF
 
 echo "14******************************************************************"
