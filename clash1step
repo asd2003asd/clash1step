@@ -1503,42 +1503,48 @@ temp_ip=(${loc_ip//./ })
 
 jy_ip=${temp_ip[0]}"."${temp_ip[1]}".0.0"
 
-iptables -t nat -N clash
+iptables -A INPUT -i lo -j ACCEPT
 echo "1******************************************************************"
-iptables -t nat -N clash_dns
+iptables -A OUTPUT -o lo -j ACCEPT
 echo "2******************************************************************"
-iptables -t nat -A PREROUTING -p tcp --dport 53 -d $jy_ip/16 -j clash_dns
-echo "3******************************************************************"
-iptables -t nat -A PREROUTING -p udp --dport 53 -d $jy_ip/16 -j clash_dns
-echo "4******************************************************************"
-iptables -t nat -A PREROUTING -p tcp -j clash
-echo "5******************************************************************"
 
-iptables -t nat -A clash_dns -p udp --dport 53 -d $jy_ip/16 -j DNAT --to-destination $loc_ip:53
+iptables -t nat -N clash
+echo "3******************************************************************"
+iptables -t nat -N clash_dns
+echo "4******************************************************************"
+iptables -t nat -A PREROUTING -p tcp --dport 53 -d 198.18.0.0/24 -j clash_dns
+echo "5******************************************************************"
+iptables -t nat -A PREROUTING -p udp --dport 53 -d 198.18.0.0/24 -j clash_dns
 echo "6******************************************************************"
-iptables -t nat -A clash_dns -p tcp --dport 53 -d $jy_ip/16 -j DNAT --to-destination $loc_ip:53
+iptables -t nat -A PREROUTING -p tcp -j clash
 echo "7******************************************************************"
-#注意：这里的网段和IP你需要自己适配自己的
-iptables -t nat -A clash -d 0.0.0.0/8 -j RETURN
-iptables -t nat -A clash -d 10.0.0.0/8 -j RETURN
-iptables -t nat -A clash -d 127.0.0.0/8 -j RETURN
-iptables -t nat -A clash -d 169.254.0.0/16 -j RETURN
-iptables -t nat -A clash -d 172.16.0.0/12 -j RETURN
-iptables -t nat -A clash -d 192.168.0.0/16 -j RETURN
-iptables -t nat -A clash -d 224.0.0.0/4 -j RETURN
-iptables -t nat -A clash -d 240.0.0.0/4 -j RETURN
+
+iptables -t nat -A clash_dns -p udp --dport 53 -d 198.18.0.0/24 -j DNAT --to-destination $loc_ip:53
 echo "8******************************************************************"
-# iptables -t nat -A clash -p tcp --dport 22 -d $loc_ip/24 -j ACCEPT
-iptables -t nat -A clash -p tcp -j REDIRECT --to-ports 7892
+iptables -t nat -A clash_dns -p tcp --dport 53 -d 198.18.0.0/24 -j DNAT --to-destination $loc_ip:53
 echo "9******************************************************************"
-iptables -t nat -A OUTPUT -p tcp -m owner ! --uid-owner clash -j REDIRECT --to-port 7892
+#注意：这里的网段和IP你需要自己适配自己的
+iptables -t nat -A clash -d 1.0.0.0/8 -j ACCEPT
+iptables -t nat -A clash -d 10.0.0.0/8 -j ACCEPT
+iptables -t nat -A clash -d 100.64.0.0/10 -j ACCEPT
+iptables -t nat -A clash -d 127.0.0.0/8 -j ACCEPT
+iptables -t nat -A clash -d 169.254.0.0/16 -j ACCEPT
+iptables -t nat -A clash -d 172.16.0.0/12 -j ACCEPT
+iptables -t nat -A clash -d 192.168.0.0/16 -j ACCEPT
+iptables -t nat -A clash -d 224.0.0.0/4 -j ACCEPT
+iptables -t nat -A clash -d 240.0.0.0/4 -j ACCEPT
+iptables -t nat -A clash -d 192.168.1.2/32 -j ACCEPT
 echo "10******************************************************************"
-netfilter-persistent save
+iptables -t nat -A clash -p tcp --dport 22 -d $loc_ip/24 -j ACCEPT
 echo "11******************************************************************"
-netfilter-persistent start
+iptables -t nat -A clash -p tcp -j REDIRECT --to-ports 7892
 echo "12******************************************************************"
-iptables-save  > /etc/iptables/rules.v4
+netfilter-persistent save
 echo "13******************************************************************"
+netfilter-persistent start
+echo "14******************************************************************"
+iptables-save  > /etc/iptables/rules.v4
+echo "15******************************************************************"
 }
 
 
@@ -1547,6 +1553,7 @@ set_ip_dns(){
 cat << EOF > /etc/network/interfaces
 source /etc/network/interfaces.d/*
 auto lo
+iface lo inet loopback
 auto  $eth_n
 iface $eth_n inet static
   address $loc_ip
@@ -1561,17 +1568,18 @@ echo "14******************************************************************"
 }
 
 dt_menu() {
- Mainmenu=$(whiptail --clear --ok-button "确定" --backtitle "version:20200324v3" --title "灯塔客户端v2.0" --menu --nocancel "
+ Mainmenu=$(whiptail --clear --ok-button "确定" --backtitle "version:20200326" --title "Clash&SmartDNS一键安装" --menu --nocancel "
 **********************************************************************************
-简介：灯塔客户端v2.0
-系统：>=debian9
+简介：Clash&SmartDNS一键安装
+系统：>=debian10
+详情：修改自油管UP主-米月大佬的“灯塔脚本”
 Youtube：米月
 电报群：https://t.me/mi_yue
 Youtube频道地址：https://t.im/n21o
 **********************************************************************************
 请选择需要安装的内容：
     " 22 86 5\
-        "1" " 安装灯塔客户端"\
+        "1" " Clash&SmartDNS一键安装"\
         "4" " 退出" 3>&1 1>&2 2>&3)
     case $Mainmenu in
         1)
@@ -1581,16 +1589,19 @@ Youtube频道地址：https://t.im/n21o
         dt_clash
         dt_iptables
         set_ip_dns
-        whiptail --title "灯塔客户端安装成功" --msgbox "
+        whiptail --title "Clash&SmartDNS一键安装成功" --msgbox "
 *************************************************************************
-灯塔客户端安装成功，把需要留学机器的网关和dns改成灯塔客户端ip。软路由请自行修改。
-灯塔客户端IP：$loc_ip
+Clash&SmartDNS一键安装成功，需要科学上网的设备请参照下面修改。软路由请自行修改。
+设备网关：$loc_ip
+设备DNS：198.18.0.1,198.18.0.2
+Clash配置文件请参照以下地址手动上传。
+Clash配置文件地址：/home/clash/.config/clash/config.yaml
+Clash控制面板:http://$loc_ip:9090/ui/
+SmartDNS上游修改地址：/etc/smartdns/smartdns.conf
+灯塔原作者相关信息如下
 Youtube：米月
 电报群：https://t.me/mi_yue
 Youtube频道地址：https://t.im/n21o
-灯塔web页面:http://$loc_ip:9090/ui/
-DNS上游修改地址：/etc/smartdns/smartdns.conf
-灯塔客户端配置文件地址：/home/clash/.config/clash/config.yaml
 *************************************************************************" 18 78
         clear
         ;;
