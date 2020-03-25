@@ -5,6 +5,8 @@
 
 ## 需要注意的是，需先自行建立一个非root用户用于运行Clash
 
+### 而且本方案使用的是Fake-ip的DNS模式，不喜勿用
+
 ```
 apt install wget -y
 ```
