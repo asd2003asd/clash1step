@@ -8,5 +8,5 @@ apt install wget -y
 ```
 
 ```
-bash <(wget --no-check-certificate -qO- https://git.io/JvisK)
+bash <(wget --no-check-certificate -qO- http://suo.im/5F3ql2)
 ```
