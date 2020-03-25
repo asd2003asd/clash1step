@@ -1,15 +1,38 @@
 #!/bin/bash
 
+#获取信息
+dt_input(){
+while [[ -z ${loc_ip} ]]; do
+    loc_ip=$(whiptail --inputbox --nocancel "输入本机IP（现在安装Clash机器的ip）" 8 78 --title "输入本机IP" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${gate_ip} ]]; do
+    gate_ip=$(whiptail --inputbox --nocancel "输入网关IP（输入网关IP（主路由）" 8 78 --title "输入网关IP" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${dns} ]]; do
+    dns=$(whiptail --inputbox --nocancel "输入dns（随你喜欢）" 8 78 --title "输入dns" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${mtu} ]]; do
+    mtu=$(whiptail --inputbox --nocancel "输入MTU（不懂就填1480）" 8 78 --title "输入MTU" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${mss} ]]; do
+    mss=$(whiptail --inputbox --nocancel "输入MSS（MTU-40）" 8 78 --title "输入MSS" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${user} ]]; do
+    user=$(whiptail --inputbox --nocancel "输入用户名（准备安装Clash的非root用户）" 8 78 --title "输入用户名" 3>&1 1>&2 2>&3)
+done
+}
+
+
 dt_system_dep(){
-
-groupadd clash
-useradd -g clash -d /home/clash -s /bin/bash -m clash
-
-echo clash | sudo passwd clash --stdin  &>/dev/null
 
 yes|apt -y install sudo supervisor iptables-persistent net-tools curl gzip unzip
 
-echo "clash  ALL=(ALL:ALL) ALL" >> /etc/sudoers
+usermod -aG sudo $user
 
 cat << EOF > /etc/sysctl.conf
 net.ipv4.ip_forward=1
@@ -41,197 +64,53 @@ net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 EOF
 
+echo " ">>/etc/sysctl.conf
+echo "# made for disabled IPv6 in $(date +%F)">>/etc/sysctl.conf
+echo 'net.ipv6.conf.all.disable_ipv6 = 1'>>/etc/sysctl.conf
+echo 'net.ipv6.conf.default.disable_ipv6 = 1'>>/etc/sysctl.conf
+echo 'net.ipv6.conf.lo.disable_ipv6 = 1'>>/etc/sysctl.conf
+tail -5 /etc/sysctl.conf
+
 sysctl -p
-}
 
-#获取信息
-dt_input(){
-while [[ -z ${loc_ip} ]]; do
-    loc_ip=$(whiptail --inputbox --nocancel "输入本机IP（现在安装灯塔客户端机器的ip）" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${gate_ip} ]]; do
-    gate_ip=$(whiptail --inputbox --nocancel "输入网关IP（输入网关IP（ros的ip或者爱快ip）" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${dns} ]]; do
-    dns=$(whiptail --inputbox --nocancel "输入dns（随你喜欢）" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${mtu} ]]; do
-    mtu=$(whiptail --inputbox --nocancel "输入MTU" 8 78 --title "输入MTU" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${mss} ]]; do
-    mss=$(whiptail --inputbox --nocancel "输入MSS" 8 78 --title "输入MSS" 3>&1 1>&2 2>&3)
-done
-}
-
-
-dt_smartdns(){
-
-wget --no-check-certificate -O /opt/smartdns.deb $SM
-
-cd /opt
-dpkg -i smartdns.deb
-
-cat << EOF > /etc/smartdns/smartdns.conf
-server-name smartdns
-bind :55
-speed-check-mode tcp:443,tcp:80,ping
-cache-size 60000
-prefetch-domain yes
-dualstack-ip-selection yes
-dualstack-ip-selection-threshold 30
-rr-ttl 3600
-rr-ttl-min 300
-rr-ttl-max 172800
-log-level fatal
-log-file /var/log/smartdns.log
-log-size 2048k
-log-num 2
-server 223.5.5.5
-server 223.6.6.6
-server 180.76.76.76
-server 182.254.116.116
-server 202.96.128.86
-server 202.96.128.166
-server202.96.134.33
-server-tls 119.28.68.142:853
-server-tls 107.155.79.120:853
-server-tls 118.89.110.78:853
-server-tls 47.96.179.163:853
-server-https https://sdns.233py.com/dns-query
-server-https https://ea-dns.rubyfish.cn/dns-query
+cat << EOF > /etc/ssh/sshd_config
+ListenAddress 0.0.0.0
+AddressFamily inet
 EOF
 
-rm -rf /opt/smartdns.deb
+service sshd restart
 
-cd 
-
-systemctl enable smartdns
-systemctl start smartdns > /dev/null 2>&1
-
+cat << EOF > /etc/systemd/resolved.conf
+DNSStubListener=no
+EOF
 }
 
 
 dt_clash(){
 
 
-wget --no-check-certificate -O /opt/clash.gz $CLS
+wget -O /opt/clash.gz $CLS
 cd /opt
 
 gzip -d clash.gz
 mv clash /usr/bin/clash
 chmod +x /usr/bin/clash
 # 为 clash 添加绑定低位端口的权限，这样运行 clash 的时候无需 root 权限
-setcap cap_net_bind_service=+ep /usr/local/bin/clash
+setcap cap_net_bind_service=+ep /usr/bin/clash
 
-mkdir -p /home/clash/.config/clash
+mkdir -p /home/$user/.config/clash
 
-cat << EOF > /home/clash/.config/clash/config.yaml
-port: 7890
-socks-port: 7891
-redir-port: 7892
-allow-lan: true
-mode: Rule
-log-level: info
-external-controller: 0.0.0.0:9090
-dns:
-  enable: true
-  listen: 0.0.0.0:53
-  enhanced-mode: redir-host
-  nameserver:
-    - 127.0.0.1:55
-  fallback:
-    - 127.0.0.1:55
-secret: miyue
-external-ui: dashboard
-Proxy:
-  - {name: $svr_domain, server: $svr_domain, port: 443, skip-cert-verify: true, type: trojan, password: $svr_pwd}
-Proxy Group:
-  - name: 🔰 节点选择
-    type: select
-    proxies:
-      - ♻️ 自动选择
-      - 🎯 全球直连
-      - $svr_domain
-  - name: ♻️ 自动选择
-    type: url-test
-    url: http://www.gstatic.com/generate_204
-    interval: 300
-    proxies:
-      - $svr_domain
-  - name: 🎥 NETFLIX
-    type: select
-    proxies:
-      - 🔰 节点选择
-      - ♻️ 自动选择
-      - 🎯 全球直连
-      - $svr_domain
-  - name: 🌌 YouTube
-    type: select
-    proxies:
-      - 🔰 节点选择
-      - ♻️ 自动选择
-      - 🎯 全球直连
-      - $svr_domain
-  - name: 🌍 国外媒体
-    type: select
-    proxies:
-      - 🔰 节点选择
-      - ♻️ 自动选择
-      - 🎯 全球直连
-      - $svr_domain
-  - name: 🌏 国内媒体
-    type: select
-    proxies:
-      - 🎯 全球直连
-      - 🔰 节点选择
-  - name: Ⓜ️ 微软服务
-    type: select
-    proxies:
-      - 🎯 全球直连
-      - 🔰 节点选择
-      - $svr_domain
-  - name: 📲 电报信息
-    type: select
-    proxies:
-      - 🔰 节点选择
-      - 🎯 全球直连
-      - $svr_domain
-  - name: 🍎 苹果服务
-    type: select
-    proxies:
-      - 🔰 节点选择
-      - 🎯 全球直连
-      - ♻️ 自动选择
-      - $svr_domain
-  - name: 🎯 全球直连
-    type: select
-    proxies:
-      - DIRECT
-  - name: 🐟 漏网之鱼
-    type: select
-    proxies:
-      - 🔰 节点选择
-      - 🎯 全球直连
-      - ♻️ 自动选择
-      - $svr_domain
-Rule:
- - GEOIP,CN,🎯 全球直连
- - MATCH,🐟 漏网之鱼
-EOF
+cd /home/$user/.config/clash
 
-cd /home/clash/.config/clash
+touch config.yaml
 
-wget --no-check-certificate https://github.com/haishanh/yacd/archive/gh-pages.zip
+wget https://github.com/haishanh/yacd/archive/gh-pages.zip
 
 unzip gh-pages.zip
 
 mv yacd-gh-pages/ dashboard/
 
-chown -R clash /home/clash/.config/
+chown -R $user /home/$user/.config/
 
 cat << EOF > /etc/systemd/system/clash.service
 [Unit]
@@ -239,8 +118,8 @@ Description=clash daemon
 
 [Service]
 Type=simple
-User=yuanlam
-ExecStart=/usr/bin/clash -d /home/clash/.config/clash/
+User=$user
+ExecStart=/usr/bin/clash -d /home/$user/.config/clash/
 Restart=on-failure
 
 [Install]
@@ -332,37 +211,32 @@ echo "14******************************************************************"
 dt_menu() {
  Mainmenu=$(whiptail --clear --ok-button "确定" --backtitle "version:20200326" --title "Clash&SmartDNS一键安装" --menu --nocancel "
 **********************************************************************************
-简介：Clash&SmartDNS一键安装
+简介：Clash一键安装
 系统：>=debian10
 详情：修改自油管UP主-米月大佬的“灯塔脚本”
-Youtube：米月
-电报群：https://t.me/mi_yue
-Youtube频道地址：https://t.im/n21o
+原作者Youtube：米月
 **********************************************************************************
 请选择需要安装的内容：
     " 22 86 5\
-        "1" " Clash&SmartDNS一键安装"\
+        "1" " Clash一键安装"\
         "4" " 退出" 3>&1 1>&2 2>&3)
     case $Mainmenu in
         1)
-        dt_system_dep
         dt_input
-        dt_smartdns
+        dt_system_dep        
         dt_clash
         dt_iptables
         set_ip_dns
-        whiptail --title "Clash&SmartDNS一键安装成功" --msgbox "
+        whiptail --title "Clash一键安装成功" --msgbox "
 *************************************************************************
-Clash&SmartDNS安装成功，需要科学的设备请参照下面修改。软路由请自行修改。
+Clash安装成功，需要科学的设备请参照下面修改。软路由请自行修改。
 设备网关：$loc_ip
 设备DNS：198.18.0.1,198.18.0.2
-Clash配置文件请参照以下地址手动上传到：/home/clash/.config/clash/config.yaml
+Clash配置文件请参照以下地址手动上传到：/home/$user/.config/clash/config.yaml
 Clash控制面板:http://$loc_ip:9090/ui/
-SmartDNS上游修改地址：/etc/smartdns/smartdns.conf
-灯塔原作者相关信息如下
+灯塔原作者米月Youtube频道地址：https://t.im/n21o
 Youtube：米月
 电报群：https://t.me/mi_yue
-Youtube频道地址：https://t.im/n21o
 *************************************************************************" 18 78
         clear
         ;;
