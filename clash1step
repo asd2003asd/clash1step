@@ -59,11 +59,11 @@ while [[ -z ${dns} ]]; do
 done
 
 while [[ -z ${mtu} ]]; do
-    mtu=$(whiptail --inputbox --nocancel "输入MTU" 8 78 --title "输入域名" 3>&1 1>&2 2>&3)
+    mtu=$(whiptail --inputbox --nocancel "输入MTU" 8 78 --title "输入MTU" 3>&1 1>&2 2>&3)
 done
 
 while [[ -z ${mss} ]]; do
-    mss=$(whiptail --inputbox --nocancel "输入MSS" 8 78 --title "输入密码" 3>&1 1>&2 2>&3)
+    mss=$(whiptail --inputbox --nocancel "输入MSS" 8 78 --title "输入MSS" 3>&1 1>&2 2>&3)
 done
 }
 
@@ -85,18 +85,25 @@ dualstack-ip-selection yes
 dualstack-ip-selection-threshold 30
 rr-ttl 3600
 rr-ttl-min 300
-rr-ttl-max 7200
+rr-ttl-max 172800
 log-level fatal
 log-file /var/log/smartdns.log
 log-size 2048k
 log-num 2
 conf-file /etc/smartdns/gfw_domain.conf
-server 114.114.114.114
 server 223.5.5.5
-server 119.28.28.28
-server-tls 8.8.8.8 -group GFW -exclude-default-group
-server-tls 1.1.1.1 -group GFW -exclude-default-group
-server-tls 8.8.4.4 -group GFW -exclude-default-group    
+server 223.6.6.6
+server 180.76.76.76
+server 182.254.116.116
+server 202.96.128.86
+server 202.96.128.166
+server202.96.134.33
+server-tls 119.28.68.142:853
+server-tls 107.155.79.120:853
+server-tls 118.89.110.78:853
+server-tls 47.96.179.163:853
+server-https https://sdns.233py.com/dns-query
+server-https https://ea-dns.rubyfish.cn/dns-query
 EOF
 
 rm -rf /opt/smartdns.deb
