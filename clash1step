@@ -1464,11 +1464,11 @@ cd /home/clash/.config/clash
 
 mkdir dashboard
 
-wget --no-check-certificate https://raw.githubusercontent.com/pzwsquare/dt_client/master/web/clash-dashboard-gh-pages.zip
+wget --no-check-certificate https://github.com/haishanh/yacd/archive/gh-pages.zip
 
-unzip clash-dashboard-gh-pages.zip
+unzip gh-pages.zip
 
-mv clash-dashboard-gh-pages/* dashboard/
+mv yacd-gh-pages/ dashboard/
 
 chown -R clash /home/clash/.config/
 
