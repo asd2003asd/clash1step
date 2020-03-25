@@ -240,7 +240,7 @@ Description=clash daemon
 [Service]
 Type=simple
 User=yuanlam
-ExecStart=/usr/bin/clash -d /home/yuanlam/.config/clash/
+ExecStart=/usr/bin/clash -d /home/clash/.config/clash/
 Restart=on-failure
 
 [Install]
