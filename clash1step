@@ -2,6 +2,14 @@
 
 #获取信息
 dt_input(){
+while [[ -z ${user} ]]; do
+    user=$(whiptail --inputbox --nocancel "输入用户名（准备安装Clash的非root用户）" 8 78 --title "创建非root用户" 3>&1 1>&2 2>&3)
+done
+
+while [[ -z ${password} ]]; do
+    password=$(whiptail --inputbox --nocancel "输入密码" 8 78 --title "创建密码" 3>&1 1>&2 2>&3)
+done
+
 while [[ -z ${loc_ip} ]]; do
     loc_ip=$(whiptail --inputbox --nocancel "输入本机IP（现在安装Clash机器的ip）" 8 78 --title "输入本机IP" 3>&1 1>&2 2>&3)
 done
@@ -20,14 +28,6 @@ done
 
 while [[ -z ${mss} ]]; do
     mss=$(whiptail --inputbox --nocancel "输入MSS（MTU-40）" 8 78 --title "输入MSS" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${user} ]]; do
-    user=$(whiptail --inputbox --nocancel "输入用户名（准备安装Clash的非root用户）" 8 78 --title "创建非root用户" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${password} ]]; do
-    password=$(whiptail --inputbox --nocancel "输入密码" 8 78 --title "创建密码" 3>&1 1>&2 2>&3)
 done
 }
 
