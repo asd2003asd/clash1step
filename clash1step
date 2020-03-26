@@ -236,9 +236,11 @@ Clash控制面板:http://$loc_ip:9090/ui/
 Youtube：米月
 电报群：https://t.me/mi_yue
 *************************************************************************" 18 78        
+        clear
         ;;
         4)
         #exit
+        clear
         whiptail --title "脚本已退出" --msgbox "真希望把你留住" 8 78
         ;;
         esac       
