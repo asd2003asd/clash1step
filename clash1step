@@ -207,7 +207,7 @@ echo "14******************************************************************"
 }
 
 dt_menu() {
- Mainmenu=$(whiptail --clear --ok-button "确定" --backtitle "version:20200326" --title "Clash&SmartDNS一键安装" --menu --nocancel "
+ Mainmenu=$(whiptail --clear --ok-button "确定" --backtitle "version:20200326" --title "Clash一键安装" --menu --nocancel "
 **********************************************************************************
 简介：Clash一键安装
 系统：>=debian10
@@ -235,8 +235,7 @@ Clash控制面板:http://$loc_ip:9090/ui/
 灯塔原作者米月Youtube频道地址：https://t.im/n21o
 Youtube：米月
 电报群：https://t.me/mi_yue
-*************************************************************************" 18 78
-        clear
+*************************************************************************" 18 78        
         ;;
         4)
         #exit
