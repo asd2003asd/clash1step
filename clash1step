@@ -42,6 +42,8 @@ echo $user:$password|chpasswd
 
 usermod -aG sudo $user
 
+echo " ">>/etc/sysctl.conf
+echo "# made in $(date +%F)">>/etc/sysctl.conf
 echo 'net.ipv4.ip_forward=1'>>/etc/sysctl.conf
 echo 'fs.file-max = 999999'>>/etc/sysctl.conf
 echo 'net.core.rmem_max = 67108864'>>/etc/sysctl.conf
@@ -67,10 +69,8 @@ echo 'net.ipv4.ip_local_port_range = 1024 65000'>>/etc/sysctl.conf
 echo 'net.ipv4.udp_mem = 8192 131072 67108864'>>/etc/sysctl.conf
 echo 'net.ipv4.udp_rmem_min = 4096'>>/etc/sysctl.conf
 echo 'net.ipv4.udp_wmem_min = 4096'>>/etc/sysctl.conf
-echo 'net.core.default_qdisc = fq
-echo 'net.ipv4.tcp_congestion_control = bbr
-echo " ">>/etc/sysctl.conf
-echo "# made for disabled IPv6 in $(date +%F)">>/etc/sysctl.conf
+echo 'net.core.default_qdisc = fq>>/etc/sysctl.conf
+echo 'net.ipv4.tcp_congestion_control = bbr>>/etc/sysctl.conf
 echo 'net.ipv6.conf.all.disable_ipv6 = 1'>>/etc/sysctl.conf
 echo 'net.ipv6.conf.default.disable_ipv6 = 1'>>/etc/sysctl.conf
 echo 'net.ipv6.conf.lo.disable_ipv6 = 1'>>/etc/sysctl.conf
@@ -78,16 +78,12 @@ tail -5 /etc/sysctl.conf
 
 sysctl -p
 
-cat << EOF > /etc/ssh/sshd_config
-ListenAddress 0.0.0.0
-AddressFamily inet
-EOF
+echo 'ListenAddress 0.0.0.0'>>/etc/ssh/sshd_config
+echo 'AddressFamily inet'>>/etc/ssh/sshd_config
 
 service sshd restart
 
-cat << EOF > /etc/systemd/resolved.conf
-DNSStubListener=no
-EOF
+echo 'DNSStubListener=no'>>/etc/systemd/resolved.conf
 }
 
 
