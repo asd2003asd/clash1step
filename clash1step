@@ -254,6 +254,7 @@ Youtube：米月
         whiptail --title "脚本已退出" --msgbox "真希望把你留住" 8 78
         ;;
         esac
+systemctl status clash.service        
 }
 
 eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d':' -f1 | cut -d'@' -f1)
