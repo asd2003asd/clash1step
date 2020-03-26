@@ -35,8 +35,9 @@ yes|apt -y install sudo supervisor iptables-persistent net-tools curl gzip unzip
 usermod -aG sudo $user
 
 echo " ">>/etc/sysctl.conf
-echo "# made in $(date +%F)">>/etc/sysctl.conf
+echo "# made ipv4-forward in $(date +%F)">>/etc/sysctl.conf
 echo 'net.ipv4.ip_forward=1'>>/etc/sysctl.conf
+echo " ">>/etc/sysctl.conf
 echo 'fs.file-max = 999999'>>/etc/sysctl.conf
 echo 'net.core.rmem_max = 67108864'>>/etc/sysctl.conf
 echo 'net.core.wmem_max = 67108864'>>/etc/sysctl.conf
@@ -61,8 +62,12 @@ echo 'net.ipv4.ip_local_port_range = 1024 65000'>>/etc/sysctl.conf
 echo 'net.ipv4.udp_mem = 8192 131072 67108864'>>/etc/sysctl.conf
 echo 'net.ipv4.udp_rmem_min = 4096'>>/etc/sysctl.conf
 echo 'net.ipv4.udp_wmem_min = 4096'>>/etc/sysctl.conf
-echo 'net.core.default_qdisc = fq>>/etc/sysctl.conf
-echo 'net.ipv4.tcp_congestion_control = bbr>>/etc/sysctl.conf
+echo " ">>/etc/sysctl.conf
+echo "# made bbr in $(date +%F)">>/etc/sysctl.conf
+echo 'net.core.default_qdisc = fq'>>/etc/sysctl.conf
+echo 'net.ipv4.tcp_congestion_control = bbr'>>/etc/sysctl.conf
+echo " ">>/etc/sysctl.conf
+echo "# made ipv6-disable in $(date +%F)">>/etc/sysctl.conf
 echo 'net.ipv6.conf.all.disable_ipv6 = 1'>>/etc/sysctl.conf
 echo 'net.ipv6.conf.default.disable_ipv6 = 1'>>/etc/sysctl.conf
 echo 'net.ipv6.conf.lo.disable_ipv6 = 1'>>/etc/sysctl.conf
@@ -235,7 +240,6 @@ Youtube：米月
         ;;
         4)
         #exit
-        clear
         whiptail --title "脚本已退出" --msgbox "真希望把你留住" 8 78
         ;;
         esac       
