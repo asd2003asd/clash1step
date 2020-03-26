@@ -3,11 +3,7 @@
 #获取信息
 dt_input(){
 while [[ -z ${user} ]]; do
-    user=$(whiptail --inputbox --nocancel "输入用户名（准备安装Clash的非root用户）" 8 78 --title "创建非root用户" 3>&1 1>&2 2>&3)
-done
-
-while [[ -z ${password} ]]; do
-    password=$(whiptail --inputbox --nocancel "输入密码" 8 78 --title "创建密码" 3>&1 1>&2 2>&3)
+    user=$(whiptail --inputbox --nocancel "输入用户名（准备安装Clash的非root用户）" 8 78 --title "输入用户名" 3>&1 1>&2 2>&3)
 done
 
 while [[ -z ${loc_ip} ]]; do
@@ -34,11 +30,7 @@ done
 
 dt_system_dep(){
 
-yes|apt -y install sudo supervisor iptables-persistent net-tools curl gzip unzip
-
-useradd -m -s /bin/bash $user
-
-echo $user:$password|chpasswd
+yes|apt -y install sudo supervisor iptables-persistent net-tools curl gzip unzip htop
 
 usermod -aG sudo $user
 
