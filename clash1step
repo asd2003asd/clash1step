@@ -118,7 +118,7 @@ unzip gh-pages.zip
 
 mv yacd-gh-pages/ dashboard/
 
-chown -R $user /home/$user/.config/
+chown -R $user /home/$user/
 
 cat << EOF > /etc/systemd/system/clash.service
 [Unit]
@@ -253,8 +253,7 @@ Youtube：米月
         clear
         whiptail --title "脚本已退出" --msgbox "真希望把你留住" 8 78
         ;;
-        esac
-systemctl status clash.service        
+        esac       
 }
 
 eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d':' -f1 | cut -d'@' -f1)
