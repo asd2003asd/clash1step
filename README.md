@@ -9,6 +9,8 @@
 
 ### 而且本方案使用的是Fake-ip的DNS模式，不喜勿用
 
+### 安装完成后需手动上传yaml配置文件至：/home/用户名/.config/clash/
+
 ```
 apt install wget -y
 ```
@@ -16,3 +18,19 @@ apt install wget -y
 ```
 bash <(wget --no-check-certificate -qO- http://suo.im/5F3ql2)
 ```
+
+### 加入Smartdns和undound
+
+SmartDNS管理命令
+```
+systemctl restart smartdns      #重启
+
+systemctl status smartdns      #查看状态
+```
+unbound管理命令
+```
+systemctl restart unbound      #重启
+
+systemctl status unbound      #查看状态
+```
+
