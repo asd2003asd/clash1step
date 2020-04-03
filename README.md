@@ -18,6 +18,14 @@ apt install wget -y
 ```
 bash <(wget --no-check-certificate -qO- http://suo.im/5F3ql2)
 ```
+Clash管理命令
+```
+systemctl restart clash.service      #重启
+
+systemctl status clash.service      #查看状态
+
+journalctl -u clash.service -f      #滚动实时状态
+```
 
 ### 加入Smartdns和undound
 
