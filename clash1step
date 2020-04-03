@@ -98,47 +98,7 @@ chmod +x ./install
 
 cd /etc/smartdns/
 
-sed -i '/^bind/d' smartdns.conf
-
-sed -i '/^cache-size/d' smartdns.conf
-
-echo 'server-name smartdns'>>smartdns.conf
-
-echo 'bind :5301'>>smartdns.conf
-
-echo 'cache-size 0'>>smartdns.conf
-
-echo 'prefetch-domain yes'>>smartdns.conf
-
-echo 'serve-expired yes'>>smartdns.conf
-
-echo 'serve-expired-ttl 0'>>smartdns.conf
-
-echo 'force-AAAA-SOA yes'>>smartdns.conf
-
-echo 'rr-ttl-min 60'>>smartdns.conf
-
-echo 'rr-ttl-max 86400'>>smartdns.conf
-
-echo 'server 223.5.5.5'>>smartdns.conf
-
-echo 'server 223.6.6.6'>>smartdns.conf
-
-echo 'server 180.76.76.76'>>smartdns.conf
-
-echo 'server 182.254.116.116'>>smartdns.conf
-
-echo 'server-tls 119.28.68.142:853'>>smartdns.conf
-
-echo 'server-tls 107.155.79.120:853'>>smartdns.conf
-
-echo 'server-tls 118.89.110.78:853'>>smartdns.conf
-
-echo 'server-tls 47.96.179.163:853'>>smartdns.conf
-
-echo 'server-https https://sdns.233py.com/dns-query'>>smartdns.conf
-
-echo 'server-https https://ea-dns.rubyfish.cn/dns-query'>>smartdns.conf
+wget https://raw.githubusercontent.com/yuanlam/clash1step/master/smartdns.conf
 
 systemctl enable smartdns
 
@@ -154,6 +114,10 @@ cat > /etc/default/unbound << EOF
 RESOLVCONF="false"
 ROOT_TRUST_ANCHOR_UPDATE="false"
 EOF
+
+cd /etc/unbound/
+
+wget https://raw.githubusercontent.com/yuanlam/clash1step/master/unbound.conf
 
 # 下载证书
 wget ftp://FTP.INTERNIC.NET/domain/named.cache -O/etc/unbound/root.hints
