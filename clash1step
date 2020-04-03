@@ -98,7 +98,7 @@ chmod +x ./install
 
 cd /etc/smartdns/
 
-wget https://raw.githubusercontent.com/yuanlam/clash1step/master/smartdns.conf
+wget https://raw.githubusercontent.com/yuanlam/clash1step/master/smartdns.conf -O smartdns.conf
 
 systemctl enable smartdns
 
@@ -117,7 +117,7 @@ EOF
 
 cd /etc/unbound/
 
-wget https://raw.githubusercontent.com/yuanlam/clash1step/master/unbound.conf
+wget https://raw.githubusercontent.com/yuanlam/clash1step/master/unbound.conf -O unbound.conf
 
 # 下载证书
 wget ftp://FTP.INTERNIC.NET/domain/named.cache -O/etc/unbound/root.hints
